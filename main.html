@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Countdown to Sami's Exam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#0f1226; --bg2:#1a0f2b; --glass:rgba(255,255,255,.08); --stroke:rgba(255,255,255,.18); --text:#f3f6ff; --muted:#b9c0ff;
+      --accent:#8b7bff; --accent2:#25d0ff; --glow:#6ee7ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text); font-family:Outfit, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 80% -10%, #2d1b5a 0%, transparent 60%),
+                  radial-gradient(1000px 500px at 10% 110%, #0d5b87 0%, transparent 65%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* Subtle stars */
+    .stars{position:fixed; inset:0; pointer-events:none; background-image:radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.35) 40%, transparent 41%),
+      radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,.25) 40%, transparent 41%),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.2) 40%, transparent 41%),
+      radial-gradient(1px 1px at 90% 20%, rgba(255,255,255,.25) 40%, transparent 41%);}    
+
+    .wrap{min-height:100%; display:grid; place-items:center; padding:32px}
+
+    .card{
+      width:min(980px, 92vw); backdrop-filter: blur(14px) saturate(120%);
+      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      border:1px solid var(--stroke); border-radius:28px; padding:28px 28px 32px; position:relative; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .card::before{content:""; position:absolute; inset:auto -20% 0 -20%; height:110px; background:radial-gradient(800px 120px at 50% 0, rgba(204,255,255,.35), transparent 70%); filter:blur(24px);}
+
+    .title{display:flex; align-items:center; gap:12px; margin:6px 0 8px}
+    .pill{font:600 12px/1 JetBrains Mono, monospace; letter-spacing: .08em; text-transform:uppercase; color:#00151a; background:linear-gradient(180deg, #a9f1ff, #39e0ff); padding:8px 10px; border-radius:999px; border:1px solid rgba(0,0,0,.08); box-shadow:0 2px 8px rgba(57,224,255,.35)}
+    h1{margin:0; font-size: clamp(24px, 3.4vw, 40px); font-weight:800; letter-spacing:.01em}
+    .sub{margin: 6px 0 18px; color:var(--muted)}
+
+    .grid{display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:16px}
+    @media (max-width:700px){ .grid{grid-template-columns: repeat(2, 1fr);} }
+
+    .unit{
+      position:relative; border-radius:22px; border:1px solid var(--stroke); background:var(--glass); padding:20px; overflow:hidden; 
+      box-shadow: inset 0 -40px 80px rgba(139,123,255,.08), inset 0 0 32px rgba(37,208,255,.05);
+    }
+    .unit .label{font:600 12px/1 JetBrains Mono, monospace; letter-spacing:.12em; color:var(--muted); text-transform:uppercase}
+    .value{font-weight:900; letter-spacing:.02em; margin-top:10px; font-size: clamp(42px, 9vw, 86px);
+      text-shadow:0 8px 30px rgba(0,0,0,.35), 0 0 24px rgba(110,231,255,.25);
+    }
+
+    .progress{
+      position:absolute; inset:-2px; border-radius:24px; pointer-events:none; 
+      background:
+        conic-gradient(from 0turn, var(--accent) var(--pct, 0%), rgba(255,255,255,.06) 0%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      padding:2px; opacity:.85;
+    }
+
+    .footer{
+      margin-top:22px; display:flex; flex-wrap:wrap; align-items:center; gap:12px; justify-content:space-between; color:var(--muted)
+    }
+    .when{font:600 13px/1.3 JetBrains Mono, monospace}
+    .tz{opacity:.9}
+
+    .glimmer{position:absolute; inset:auto 0 0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent); opacity:.6}
+
+    /* Celebration state */
+    .celebrate h1{background: linear-gradient(90deg, #fff, #a9f1ff 30%, #8b7bff 60%, #fff); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .confetti{position:fixed; inset:0; pointer-events:none; overflow:hidden}
+    .confetti i{position:absolute; width:8px; height:14px; background:linear-gradient(180deg, #fff, #a9f1ff); left:var(--x); top:-20px; transform:rotate(var(--r)); animation:fall var(--d) linear infinite; opacity:.9}
+    @keyframes fall{ to{ transform: translateY(110vh) rotate(calc(var(--r) + 1turn)); } }
+
+/* ===== Extra animations ===== */
+@keyframes twinkle { 0%{opacity:.7; filter:brightness(1)} 100%{opacity:1; filter:brightness(1.2)} }
+@keyframes floatY { 0%{ transform:translateY(-50%) translateX(0) } 50%{ transform:translateY(calc(-50% - 10px)) translateX(0) } 100%{ transform:translateY(-50%) translateX(0) } }
+@keyframes pop { 0%{ opacity:0; transform:translateY(12px) scale(.98) } 100%{ opacity:1; transform:translateY(0) scale(1) } }
+@keyframes rise { 0%{ opacity:0; transform:translateY(18px) } 100%{ opacity:1; transform:translateY(0) } }
+@keyframes flip { 0%{ transform:rotateX(0deg) } 45%{ transform:rotateX(85deg) } 55%{ transform:rotateX(95deg) } 100%{ transform:rotateX(0deg) } }
+@keyframes glowPulse { 0%{ box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 0 rgba(110,231,255,.18) } 100%{ box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 14px rgba(110,231,255,0) } }
+
+.stars{ animation: twinkle 10s ease-in-out infinite alternate }
+.card{ animation: pop 700ms cubic-bezier(.22,.75,.14,1) both }
+.grid .unit{ animation: rise 700ms ease both }
+.grid .unit:nth-child(1){ animation-delay:.08s }
+.grid .unit:nth-child(2){ animation-delay:.16s }
+.grid .unit:nth-child(3){ animation-delay:.24s }
+.grid .unit:nth-child(4){ animation-delay:.32s }
+.value{ transform-origin:50% 70%; will-change:transform }
+.value.flip{ animation: flip 520ms cubic-bezier(.2,.65,.2,1) }
+.card::before{ animation: glowPulse 2200ms ease-out infinite }
+
+.face{ animation: floatY 6.5s ease-in-out infinite }
+.face.right{ animation-duration:7.5s; animation-delay:.6s }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .stars, .card, .grid .unit, .value.flip, .face, .card::before{ animation:none !important }
+}
+
+/* ===== Hover animations for side photos ===== */
+.face{ cursor:pointer; transition: box-shadow .35s ease, border-color .35s ease, transform .25s ease; }
+.face img{ transition: transform .45s cubic-bezier(.2,.65,.2,1), filter .45s ease; will-change:transform; }
+.face:hover{ box-shadow:0 22px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(110,231,255,.18) inset; border-color: rgba(110,231,255,.55) }
+.face:hover img{ transform: scale(1.06); filter:saturate(1.08) contrast(1.02); }
+/* Sheen sweep */
+.face::after{ content:""; position:absolute; inset:0; background: linear-gradient(75deg, transparent 40%, rgba(255,255,255,.25) 50%, transparent 60%);
+  transform: translateX(-120%) skewX(-12deg); opacity:0; pointer-events:none; }
+.face:hover::after{ animation: sweep 1s ease forwards; }
+@keyframes sweep{ to{ transform: translateX(120%) skewX(-12deg); opacity:1 } }
+/* Pause floating while hovering so 3D tilt feels crisp */
+.face.hovering{ animation: none !important }
+
+
+    .hint{font:500 12px/1.3 Outfit, sans-serif; opacity:.9; text-align:center; margin-top:8px}
+      /* --- Side image boxes for Sami's face --- */
+    .face{position:fixed; top:50%; transform:translateY(-50%); width:clamp(120px,18vw,220px); aspect-ratio:1/1; border-radius:22px; border:1px solid var(--stroke); background:var(--glass); backdrop-filter: blur(12px) saturate(120%); box-shadow:0 14px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04); overflow:hidden; display:grid; place-items:center; z-index:5}
+    .face.left{left:22px}
+    .face.right{right:22px}
+    .face img{width:100%; height:100%; object-fit:cover; display:block}
+    .face .placeholder{font:600 12px/1.35 JetBrains Mono, monospace; color:var(--muted); text-align:center; padding:12px}
+    .face.drag{outline:2px dashed var(--accent2); outline-offset:-8px}
+    @media (max-width:1100px){ .face{display:none} }
+  </style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+  <!-- Side photo boxes (outside the clock card) -->
+
+    <div class="face right" id="faceRight" aria-label="Sami photo right">
+    <img src="./sami1.png" alt="Sami" />
+  </div>
+  <div class="face left" id="faceLeft" aria-label="Sami photo left">
+    <img src="./sami2.png" alt="Sami" />
+  </div>
+
+  <div class="wrap">
+    <main class="card" id="card">
+      <div class="title">
+        <span class="pill">Exam Countdown</span>
+        <h1>Clock until <strong>Sami's</strong> exam</h1>
+      </div>
+      <p class="sub">Stay focused — every second counts.</p>
+
+      <section class="grid" role="timer" aria-live="polite">
+        <div class="unit" id="daysBox">
+          <div class="label">Days</div>
+          <div class="value" id="days">0</div>
+          <div class="progress"></div>
+        </div>
+        <div class="unit" id="hoursBox">
+          <div class="label">Hours</div>
+          <div class="value" id="hours">0</div>
+          <div class="progress"></div>
+        </div>
+        <div class="unit" id="minsBox">
+          <div class="label">Minutes</div>
+          <div class="value" id="mins">0</div>
+          <div class="progress"></div>
+        </div>
+        <div class="unit" id="secsBox">
+          <div class="label">Seconds</div>
+          <div class="value" id="secs">0</div>
+          <div class="progress"></div>
+        </div>
+      </section>
+
+      <div class="footer">
+        <div class="when">
+          Exam time: <strong>Fri 7 Nov, 8:00 AM</strong> (Australia/Melbourne)
+        </div>
+        <div class="tz">Your local time now: <span id="now"></span></div>
+      </div>
+      <div class="hint">Eighty</div>
+      <div class="glimmer"></div>
+    </main>
+  </div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script>
+    // === CONFIG ===
+    // The exam is 8:00 AM on 7 November, Australia/Melbourne (AEDT in Nov).
+    // In UTC, that's 21:00 on 6 November 2025.
+    const TARGET_UTC_ISO = '2025-11-06T21:00:00Z';
+
+    const $ = sel => document.querySelector(sel);
+    const daysEl = $('#days');
+    const hoursEl = $('#hours');
+    const minsEl = $('#mins');
+    const secsEl = $('#secs');
+    const nowEl = $('#now');
+
+    const boxes = {
+      days: $('#daysBox'),
+      hours: $('#hoursBox'),
+      mins: $('#minsBox'),
+      secs: $('#secsBox')
+    };
+
+    // Format current local time beneath the clock
+    function fmtNow(){
+      try{
+        nowEl.textContent = new Date().toLocaleString(undefined, { dateStyle:'full', timeStyle:'medium' });
+      }catch{ nowEl.textContent = new Date().toString(); }
+    }
+
+    // Simple confetti generator
+    function burst(){
+      const holder = $('#confetti');
+      holder.innerHTML = '';
+      const N = 120;
+      for(let i=0;i<N;i++){
+        const piece = document.createElement('i');
+        piece.style.setProperty('--x', Math.random()*100 + 'vw');
+        piece.style.setProperty('--r', (Math.random()*360) + 'deg');
+        piece.style.setProperty('--d', (5 + Math.random()*6) + 's');
+        // Vary colour a bit
+        const hue = Math.floor(180 + Math.random()*140);
+        piece.style.background = `linear-gradient(180deg, hsl(${hue} 100% 95%), hsl(${hue} 90% 55%))`;
+        holder.appendChild(piece);
+      }
+      // auto stop after 8s
+      setTimeout(()=> holder.innerHTML = '', 8000);
+    }
+
+    // Update progress borders for each unit (visual flair)
+    function setProgress(el, pct){
+      const pr = el.querySelector('.progress');
+      if(pr) pr.style.setProperty('--pct', (Math.max(0, Math.min(100, pct))*1) + '%');
+    }
+
+    // Compute countdown
+    const target = new Date(TARGET_UTC_ISO).getTime();
+    let previous = {d:0,h:0,m:0,s:0};
+    let celebrating = false;
+
+    function tick(){
+      const now = Date.now();
+      const diff = Math.max(0, target - now);
+
+      const d = Math.floor(diff / (24*60*60*1000));
+      const h = Math.floor((diff % (24*60*60*1000)) / (60*60*1000));
+      const m = Math.floor((diff % (60*60*1000)) / (60*1000));
+      const s = Math.floor((diff % (60*1000)) / 1000);
+
+      // Update UI only if changed (reduces layout work)
+      if(previous.d !== d){ daysEl.textContent = d.toLocaleString(); daysEl.classList.remove('flip'); void daysEl.offsetWidth; daysEl.classList.add('flip'); }
+      if(previous.h !== h){ hoursEl.textContent = h.toString().padStart(2,'0'); hoursEl.classList.remove('flip'); void hoursEl.offsetWidth; hoursEl.classList.add('flip'); }
+      if(previous.m !== m){ minsEl.textContent = m.toString().padStart(2,'0'); minsEl.classList.remove('flip'); void minsEl.offsetWidth; minsEl.classList.add('flip'); }
+      if(previous.s !== s){ secsEl.textContent = s.toString().padStart(2,'0'); secsEl.classList.remove('flip'); void secsEl.offsetWidth; secsEl.classList.add('flip'); }
+      previous = {d,h,m,s};
+
+      // Progress visuals within each unit
+      const dayPct = (24*60*60*1000 - (diff % (24*60*60*1000))) / (24*60*60*1000) * 100;
+      const hourPct = (60*60*1000 - (diff % (60*60*1000))) / (60*60*1000) * 100;
+      const minPct = (60*1000 - (diff % (60*1000))) / (60*1000) * 100;
+      const secPct = (1000 - (diff % 1000)) / 1000 * 100;
+
+      setProgress(boxes.days, dayPct);
+      setProgress(boxes.hours, hourPct);
+      setProgress(boxes.mins, minPct);
+      setProgress(boxes.secs, secPct);
+
+      // Celebration when countdown hits zero
+      if(diff === 0 && !celebrating){
+        celebrating = true;
+        document.getElementById('card').classList.add('celebrate');
+        burst();
+        $('.sub').textContent = "It's exam time — you got this!";
+      }
+
+      fmtNow();
+    }
+
+    // Initial paint + interval
+    tick();
+    setInterval(tick, 1000);
+      // Enable drag & drop image placement for side boxes
+    function wireFaceBox(el){
+      if(!el) return;
+      el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('drag'); });
+      el.addEventListener('dragleave', ()=> el.classList.remove('drag'));
+      el.addEventListener('drop', e=>{
+        e.preventDefault(); el.classList.remove('drag');
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if(file && /^image\//.test(file.type)){
+          const url = URL.createObjectURL(file);
+          el.innerHTML = '';
+          const img = new Image(); img.src = url; img.alt = 'Sami';
+          el.appendChild(img);
+        }
+      });
+    }
+    wireFaceBox(document.getElementById('faceLeft'));
+    wireFaceBox(document.getElementById('faceRight'));
+
+    // 3D hover tilt / magnetic effect
+    function wireFaceHover(el){
+      if(!el) return;
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduce) return;
+      const maxTilt = 10; // degrees
+      const maxMove = 8;  // px
+      const baseY = '-50%';
+      function onMove(e){
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;  // 0..1
+        const y = (e.clientY - r.top) / r.height;  // 0..1
+        const rx = (0.5 - y) * maxTilt; // rotateX
+        const ry = (x - 0.5) * maxTilt; // rotateY
+        const tx = (x - 0.5) * maxMove;
+        const ty = (y - 0.5) * maxMove;
+        el.style.transform = `translateY(${baseY}) translate(${tx}px, ${ty}px) perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      }
+      function onEnter(){ el.classList.add('hovering'); }
+      function onLeave(){ el.classList.remove('hovering'); el.style.transform = `translateY(${baseY})`; }
+      el.addEventListener('mousemove', onMove);
+      el.addEventListener('mouseenter', onEnter);
+      el.addEventListener('mouseleave', onLeave);
+    }
+    wireFaceHover(document.getElementById('faceLeft'));
+    wireFaceHover(document.getElementById('faceRight'));
+  </script>
+</body>
+</html>
