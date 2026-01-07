@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Countdown to Sami's Exam</title>
+  <title>Countdown to Civil Procedure</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -132,9 +132,7 @@
 </head>
 <body>
   <div class="stars" aria-hidden="true"></div>
-  <!-- Side photo boxes (outside the clock card) -->
-
-    <div class="face right" id="faceRight" aria-label="Sami photo right">
+  <div class="face right" id="faceRight" aria-label="Sami photo right">
     <img src="./sami1.png" alt="Sami" />
   </div>
   <div class="face left" id="faceLeft" aria-label="Sami photo left">
@@ -145,9 +143,9 @@
     <main class="card" id="card">
       <div class="title">
         <span class="pill">Exam Countdown</span>
-        <h1>Clock until <strong>Sami's</strong> exam</h1>
+        <h1>Time until <strong>Civil Procedure</strong></h1>
       </div>
-      <p class="sub">Stay focused — every second counts.</p>
+      <p class="sub">Stay focused — Nussen Ainsworth is waiting.</p>
 
       <section class="grid" role="timer" aria-live="polite">
         <div class="unit" id="daysBox">
@@ -174,7 +172,7 @@
 
       <div class="footer">
         <div class="when">
-          Exam time: <strong>Fri 7 Nov, 8:00 AM</strong> (Australia/Melbourne)
+          Exam time: <strong>Wed 4 Feb 2026, 2:00 PM</strong> (Room 10.208)
         </div>
         <div class="tz">Your local time now: <span id="now"></span></div>
       </div>
@@ -186,9 +184,9 @@
 
   <script>
     // === CONFIG ===
-    // The exam is 8:00 AM on 7 November, Australia/Melbourne (AEDT in Nov).
-    // In UTC, that's 21:00 on 6 November 2025.
-    const TARGET_UTC_ISO = '2025-11-06T21:00:00Z';
+    // The exam is 4/02/2026 at 2:00 PM (14:00) AEDT (UTC+11)
+    // In UTC, that is 3:00 AM on the same day.
+    const TARGET_UTC_ISO = '2026-02-04T03:00:00Z';
 
     const $ = sel => document.querySelector(sel);
     const daysEl = $('#days');
@@ -246,87 +244,3 @@
       const diff = Math.max(0, target - now);
 
       const d = Math.floor(diff / (24*60*60*1000));
-      const h = Math.floor((diff % (24*60*60*1000)) / (60*60*1000));
-      const m = Math.floor((diff % (60*60*1000)) / (60*1000));
-      const s = Math.floor((diff % (60*1000)) / 1000);
-
-      // Update UI only if changed (reduces layout work)
-      if(previous.d !== d){ daysEl.textContent = d.toLocaleString(); daysEl.classList.remove('flip'); void daysEl.offsetWidth; daysEl.classList.add('flip'); }
-      if(previous.h !== h){ hoursEl.textContent = h.toString().padStart(2,'0'); hoursEl.classList.remove('flip'); void hoursEl.offsetWidth; hoursEl.classList.add('flip'); }
-      if(previous.m !== m){ minsEl.textContent = m.toString().padStart(2,'0'); minsEl.classList.remove('flip'); void minsEl.offsetWidth; minsEl.classList.add('flip'); }
-      if(previous.s !== s){ secsEl.textContent = s.toString().padStart(2,'0'); secsEl.classList.remove('flip'); void secsEl.offsetWidth; secsEl.classList.add('flip'); }
-      previous = {d,h,m,s};
-
-      // Progress visuals within each unit
-      const dayPct = (24*60*60*1000 - (diff % (24*60*60*1000))) / (24*60*60*1000) * 100;
-      const hourPct = (60*60*1000 - (diff % (60*60*1000))) / (60*60*1000) * 100;
-      const minPct = (60*1000 - (diff % (60*1000))) / (60*1000) * 100;
-      const secPct = (1000 - (diff % 1000)) / 1000 * 100;
-
-      setProgress(boxes.days, dayPct);
-      setProgress(boxes.hours, hourPct);
-      setProgress(boxes.mins, minPct);
-      setProgress(boxes.secs, secPct);
-
-      // Celebration when countdown hits zero
-      if(diff === 0 && !celebrating){
-        celebrating = true;
-        document.getElementById('card').classList.add('celebrate');
-        burst();
-        $('.sub').textContent = "It's exam time — you got this!";
-      }
-
-      fmtNow();
-    }
-
-    // Initial paint + interval
-    tick();
-    setInterval(tick, 1000);
-      // Enable drag & drop image placement for side boxes
-    function wireFaceBox(el){
-      if(!el) return;
-      el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('drag'); });
-      el.addEventListener('dragleave', ()=> el.classList.remove('drag'));
-      el.addEventListener('drop', e=>{
-        e.preventDefault(); el.classList.remove('drag');
-        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-        if(file && /^image\//.test(file.type)){
-          const url = URL.createObjectURL(file);
-          el.innerHTML = '';
-          const img = new Image(); img.src = url; img.alt = 'Sami';
-          el.appendChild(img);
-        }
-      });
-    }
-    wireFaceBox(document.getElementById('faceLeft'));
-    wireFaceBox(document.getElementById('faceRight'));
-
-    // 3D hover tilt / magnetic effect
-    function wireFaceHover(el){
-      if(!el) return;
-      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(reduce) return;
-      const maxTilt = 10; // degrees
-      const maxMove = 8;  // px
-      const baseY = '-50%';
-      function onMove(e){
-        const r = el.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width;  // 0..1
-        const y = (e.clientY - r.top) / r.height;  // 0..1
-        const rx = (0.5 - y) * maxTilt; // rotateX
-        const ry = (x - 0.5) * maxTilt; // rotateY
-        const tx = (x - 0.5) * maxMove;
-        const ty = (y - 0.5) * maxMove;
-        el.style.transform = `translateY(${baseY}) translate(${tx}px, ${ty}px) perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg)`;
-      }
-      function onEnter(){ el.classList.add('hovering'); }
-      function onLeave(){ el.classList.remove('hovering'); el.style.transform = `translateY(${baseY})`; }
-      el.addEventListener('mousemove', onMove);
-      el.addEventListener('mouseenter', onEnter);
-      el.addEventListener('mouseleave', onLeave);
-    }
-    wireFaceHover(document.getElementById('faceLeft'));
-    wireFaceHover(document.getElementById('faceRight'));
-  </script>
-</body>
-</html>
