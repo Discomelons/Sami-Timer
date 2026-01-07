@@ -78,66 +78,33 @@
     .confetti i{position:absolute; width:8px; height:14px; background:linear-gradient(180deg, #fff, #a9f1ff); left:var(--x); top:-20px; transform:rotate(var(--r)); animation:fall var(--d) linear infinite; opacity:.9}
     @keyframes fall{ to{ transform: translateY(110vh) rotate(calc(var(--r) + 1turn)); } }
 
-/* ===== Extra animations ===== */
-@keyframes twinkle { 0%{opacity:.7; filter:brightness(1)} 100%{opacity:1; filter:brightness(1.2)} }
-@keyframes floatY { 0%{ transform:translateY(-50%) translateX(0) } 50%{ transform:translateY(calc(-50% - 10px)) translateX(0) } 100%{ transform:translateY(-50%) translateX(0) } }
-@keyframes pop { 0%{ opacity:0; transform:translateY(12px) scale(.98) } 100%{ opacity:1; transform:translateY(0) scale(1) } }
-@keyframes rise { 0%{ opacity:0; transform:translateY(18px) } 100%{ opacity:1; transform:translateY(0) } }
-@keyframes flip { 0%{ transform:rotateX(0deg) } 45%{ transform:rotateX(85deg) } 55%{ transform:rotateX(95deg) } 100%{ transform:rotateX(0deg) } }
-@keyframes glowPulse { 0%{ box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 0 rgba(110,231,255,.18) } 100%{ box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 14px rgba(110,231,255,0) } }
+    /* ===== Animations ===== */
+    @keyframes twinkle { 0%{opacity:.7; filter:brightness(1)} 100%{opacity:1; filter:brightness(1.2)} }
+    @keyframes pop { 0%{ opacity:0; transform:translateY(12px) scale(.98) } 100%{ opacity:1; transform:translateY(0) scale(1) } }
+    @keyframes rise { 0%{ opacity:0; transform:translateY(18px) } 100%{ opacity:1; transform:translateY(0) } }
+    @keyframes flip { 0%{ transform:rotateX(0deg) } 45%{ transform:rotateX(85deg) } 55%{ transform:rotateX(95deg) } 100%{ transform:rotateX(0deg) } }
+    @keyframes glowPulse { 0%{ box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 0 rgba(110,231,255,.18) } 100%{ box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 14px rgba(110,231,255,0) } }
 
-.stars{ animation: twinkle 10s ease-in-out infinite alternate }
-.card{ animation: pop 700ms cubic-bezier(.22,.75,.14,1) both }
-.grid .unit{ animation: rise 700ms ease both }
-.grid .unit:nth-child(1){ animation-delay:.08s }
-.grid .unit:nth-child(2){ animation-delay:.16s }
-.grid .unit:nth-child(3){ animation-delay:.24s }
-.grid .unit:nth-child(4){ animation-delay:.32s }
-.value{ transform-origin:50% 70%; will-change:transform }
-.value.flip{ animation: flip 520ms cubic-bezier(.2,.65,.2,1) }
-.card::before{ animation: glowPulse 2200ms ease-out infinite }
+    .stars{ animation: twinkle 10s ease-in-out infinite alternate }
+    .card{ animation: pop 700ms cubic-bezier(.22,.75,.14,1) both }
+    .grid .unit{ animation: rise 700ms ease both }
+    .grid .unit:nth-child(1){ animation-delay:.08s }
+    .grid .unit:nth-child(2){ animation-delay:.16s }
+    .grid .unit:nth-child(3){ animation-delay:.24s }
+    .grid .unit:nth-child(4){ animation-delay:.32s }
+    .value{ transform-origin:50% 70%; will-change:transform }
+    .value.flip{ animation: flip 520ms cubic-bezier(.2,.65,.2,1) }
+    .card::before{ animation: glowPulse 2200ms ease-out infinite }
 
-.face{ animation: floatY 6.5s ease-in-out infinite }
-.face.right{ animation-duration:7.5s; animation-delay:.6s }
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .stars, .card, .grid .unit, .value.flip, .face, .card::before{ animation:none !important }
-}
-
-/* ===== Hover animations for side photos ===== */
-.face{ cursor:pointer; transition: box-shadow .35s ease, border-color .35s ease, transform .25s ease; }
-.face img{ transition: transform .45s cubic-bezier(.2,.65,.2,1), filter .45s ease; will-change:transform; }
-.face:hover{ box-shadow:0 22px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(110,231,255,.18) inset; border-color: rgba(110,231,255,.55) }
-.face:hover img{ transform: scale(1.06); filter:saturate(1.08) contrast(1.02); }
-/* Sheen sweep */
-.face::after{ content:""; position:absolute; inset:0; background: linear-gradient(75deg, transparent 40%, rgba(255,255,255,.25) 50%, transparent 60%);
-  transform: translateX(-120%) skewX(-12deg); opacity:0; pointer-events:none; }
-.face:hover::after{ animation: sweep 1s ease forwards; }
-@keyframes sweep{ to{ transform: translateX(120%) skewX(-12deg); opacity:1 } }
-/* Pause floating while hovering so 3D tilt feels crisp */
-.face.hovering{ animation: none !important }
-
-
+    @media (prefers-reduced-motion: reduce){
+      .stars, .card, .grid .unit, .value.flip, .card::before{ animation:none !important }
+    }
+    
     .hint{font:500 12px/1.3 Outfit, sans-serif; opacity:.9; text-align:center; margin-top:8px}
-      /* --- Side image boxes for Sami's face --- */
-    .face{position:fixed; top:50%; transform:translateY(-50%); width:clamp(120px,18vw,220px); aspect-ratio:1/1; border-radius:22px; border:1px solid var(--stroke); background:var(--glass); backdrop-filter: blur(12px) saturate(120%); box-shadow:0 14px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04); overflow:hidden; display:grid; place-items:center; z-index:5}
-    .face.left{left:22px}
-    .face.right{right:22px}
-    .face img{width:100%; height:100%; object-fit:cover; display:block}
-    .face .placeholder{font:600 12px/1.35 JetBrains Mono, monospace; color:var(--muted); text-align:center; padding:12px}
-    .face.drag{outline:2px dashed var(--accent2); outline-offset:-8px}
-    @media (max-width:1100px){ .face{display:none} }
   </style>
 </head>
 <body>
   <div class="stars" aria-hidden="true"></div>
-  <div class="face right" id="faceRight" aria-label="Sami photo right">
-    <img src="./sami1.png" alt="Sami" />
-  </div>
-  <div class="face left" id="faceLeft" aria-label="Sami photo left">
-    <img src="./sami2.png" alt="Sami" />
-  </div>
 
   <div class="wrap">
     <main class="card" id="card">
@@ -184,9 +151,9 @@
 
   <script>
     // === CONFIG ===
-    // The exam is 4/02/2026 at 2:00 PM (14:00) AEDT (UTC+11)
-    // In UTC, that is 3:00 AM on the same day.
-    const TARGET_UTC_ISO = '2026-02-04T03:00:00Z';
+    // Exam: 4 February 2026 at 2:00 PM (14:00) AEDT (GMT+11)
+    // We use ISO format with the explicit offset (+11:00) so it works in any timezone.
+    const TARGET_ISO = '2026-02-04T14:00:00+11:00';
 
     const $ = sel => document.querySelector(sel);
     const daysEl = $('#days');
@@ -219,23 +186,20 @@
         piece.style.setProperty('--x', Math.random()*100 + 'vw');
         piece.style.setProperty('--r', (Math.random()*360) + 'deg');
         piece.style.setProperty('--d', (5 + Math.random()*6) + 's');
-        // Vary colour a bit
         const hue = Math.floor(180 + Math.random()*140);
         piece.style.background = `linear-gradient(180deg, hsl(${hue} 100% 95%), hsl(${hue} 90% 55%))`;
         holder.appendChild(piece);
       }
-      // auto stop after 8s
       setTimeout(()=> holder.innerHTML = '', 8000);
     }
 
-    // Update progress borders for each unit (visual flair)
     function setProgress(el, pct){
       const pr = el.querySelector('.progress');
       if(pr) pr.style.setProperty('--pct', (Math.max(0, Math.min(100, pct))*1) + '%');
     }
 
     // Compute countdown
-    const target = new Date(TARGET_UTC_ISO).getTime();
+    const target = new Date(TARGET_ISO).getTime();
     let previous = {d:0,h:0,m:0,s:0};
     let celebrating = false;
 
@@ -244,3 +208,39 @@
       const diff = Math.max(0, target - now);
 
       const d = Math.floor(diff / (24*60*60*1000));
+      const h = Math.floor((diff % (24*60*60*1000)) / (60*60*1000));
+      const m = Math.floor((diff % (60*60*1000)) / (60*1000));
+      const s = Math.floor((diff % (60*1000)) / 1000);
+
+      // Update UI only if changed
+      if(previous.d !== d){ daysEl.textContent = d.toLocaleString(); daysEl.classList.remove('flip'); void daysEl.offsetWidth; daysEl.classList.add('flip'); }
+      if(previous.h !== h){ hoursEl.textContent = h.toString().padStart(2,'0'); hoursEl.classList.remove('flip'); void hoursEl.offsetWidth; hoursEl.classList.add('flip'); }
+      if(previous.m !== m){ minsEl.textContent = m.toString().padStart(2,'0'); minsEl.classList.remove('flip'); void minsEl.offsetWidth; minsEl.classList.add('flip'); }
+      if(previous.s !== s){ secsEl.textContent = s.toString().padStart(2,'0'); secsEl.classList.remove('flip'); void secsEl.offsetWidth; secsEl.classList.add('flip'); }
+      previous = {d,h,m,s};
+
+      const dayPct = (24*60*60*1000 - (diff % (24*60*60*1000))) / (24*60*60*1000) * 100;
+      const hourPct = (60*60*1000 - (diff % (60*60*1000))) / (60*60*1000) * 100;
+      const minPct = (60*1000 - (diff % (60*1000))) / (60*1000) * 100;
+      const secPct = (1000 - (diff % 1000)) / 1000 * 100;
+
+      setProgress(boxes.days, dayPct);
+      setProgress(boxes.hours, hourPct);
+      setProgress(boxes.mins, minPct);
+      setProgress(boxes.secs, secPct);
+
+      if(diff === 0 && !celebrating){
+        celebrating = true;
+        document.getElementById('card').classList.add('celebrate');
+        burst();
+        $('.sub').textContent = "It's exam time — you got this!";
+      }
+
+      fmtNow();
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
